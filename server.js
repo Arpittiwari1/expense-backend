@@ -20,6 +20,9 @@ app.use(
 );
 
 app.use(express.json());
+app.get('/ping', (req, res) => {
+  res.send('Server is alive');
+});
 
 connectDB();
 
