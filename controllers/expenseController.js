@@ -1,0 +1,69 @@
+const Expense = require('../models/Expense');
+const xlsx = require('xlsx');
+
+exports.addExpense = async (req, res) => {
+  const userId = req.user._id;
+  try {
+    const { icon, category, amount, date } = req.body;
+    if (!category|| !amount || !date) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    const newExpense = new Expense({
+      userId,
+      icon,
+      category,
+      amount,
+      date: new Date(date),
+    });
+    await newExpense.save();
+    res.status(200).json(newExpense);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getAllExpense = async (req, res) => {
+  const userId = req.user._id;
+  try {
+    const expenses = await Expense.find({ userId }).sort({ date: -1 });
+    res.status(200).json(expenses);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.downloadExpenseExcel = async (req, res) => {
+  const userId = req.user._id;
+  try {
+    const expenses = await Expense.find({ userId }).sort({ date: -1 });
+    const data = expenses.map(item => ({
+      category: item.category,
+      amount: item.amount,
+      date: item.date,
+    }));
+
+    const wb = xlsx.utils.book_new();
+    const ws = xlsx.utils.json_to_sheet(data);
+    xlsx.utils.book_append_sheet(wb, ws, "Expenses");
+    xlsx.writeFile(wb, "expense_details.xlsx");
+        res.download("expense_details.xlsx")
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.deleteExpense = async (req, res) => {
+  try {
+    const expense = await Expense.findByIdAndDelete(req.params.id);
+    if (!expense) {
+      return res.status(404).json({ message: "Expense not found" });
+    }
+    res.status(200).json({ message: "Expense deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
