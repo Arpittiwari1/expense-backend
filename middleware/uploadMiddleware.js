@@ -33,6 +33,8 @@ const express = require('express');
 const app = express();
 
 // In production, serve images via HTTP on Render
+const isProduction = process.env.NODE_ENV === "production";
+
 if (isProduction) {
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 }
