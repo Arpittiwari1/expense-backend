@@ -22,7 +22,7 @@ app.use(
 
 // Middleware
 app.use(express.json());
-// app.use("/uploads", express.static(path.join(__dirname, "uploads"))); 
+ app.use("/uploads", express.static(path.join(__dirname, "uploads"))); 
 //  // Serve uploaded files
 const uploadsDir = path.join(__dirname, 'uploads');
 
@@ -44,7 +44,7 @@ app.post("/upload", upload.single("image"), (req, res) => {
     }
 
     // Construct the URL of the uploaded image
-    const imageUrl = `${process.env.API_URL}/uploads/${req.file.filename}`;
+    const imageUrl = `${process.env.RENDER_DOMAIN}/uploads/${req.file.filename}`;
 
     // Respond with the image URL
     res.json({ imageUrl });
