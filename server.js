@@ -8,7 +8,7 @@ const incomeRoutes = require("./routes/incomeRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const upload = require("./middleware/uploadMiddleware"); // Importing the multer upload middleware
-
+const fs = require('fs');
 const app = express();
 
 // CORS configuration
@@ -22,7 +22,14 @@ app.use(
 
 // Middleware
 app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));  // Serve uploaded files
+// app.use("/uploads", express.static(path.join(__dirname, "uploads"))); 
+//  // Serve uploaded files
+const uploadsDir = path.join(__dirname, 'uploads');
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+  console.log('Created uploads directory');
+}
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
